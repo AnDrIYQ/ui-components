@@ -1,33 +1,40 @@
 <template>
-  <h1 @click="getData">{{ value }}</h1>
+  <h1 @click="getData">
+    So,
+    <span v-for="item of struct.list" :key="item.name">{{ item.name }}</span>
+  </h1>
 </template>
 
 <script lang="ts">
 import { getDocs, collection } from 'firebase/firestore';
-import { defineComponent, computed, toRef } from 'vue';
+import { defineComponent, reactive } from 'vue';
 export default defineComponent({
     name: 'App',
     setup() {
-        let Vname = toRef('');
-        let Vpassword = toRef('');
-        let Vlogin = toRef('');
-        const getData = async function() {
-            getDocs(collection(window.db, 'users')).then((response) => {
-                response.docs.forEach((doc) => {
-                    let { name, password, login } = doc.data();
-                    Vname.value = name;
-                    Vpassword.value = password;
-                    Vlogin.value = login;
-                });
-            });
-        };
+      interface Item {
+        name: string;
+      }
 
-        const value = computed(() => `Name: ${Vname.value}; Password: ${Vpassword.value}; Login: ${Vlogin.value}`);
+      let struct = reactive({
+          list: [] as Item[],
+      });
 
-        return {
-            value,
-            getData,
-        };
+      function addItem(item: Item) {
+          struct.list.push(item);
+      }
+
+      const getData = async function() {
+          const querySnapshot = await getDocs(collection(window.db, "users"));
+          querySnapshot.forEach((doc) => {
+              const { name } = doc.data();
+              addItem({ name });
+          });
+      };
+
+      return {
+          struct,
+          getData,
+      };
     },
 });
 </script>
