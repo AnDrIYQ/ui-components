@@ -1,5 +1,5 @@
 <template>
-  Just root
+  <h1>Some New Changes</h1>
 </template>
 
 <script lang="ts">
